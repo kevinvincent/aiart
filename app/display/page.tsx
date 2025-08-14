@@ -17,6 +17,27 @@ export default function DisplayPage() {
     }
   }, [userId])
 
+  // Fetch the latest image on component mount
+  useEffect(() => {
+    if (userId) {
+      fetchLatestImage()
+    }
+  }, [userId])
+
+  const fetchLatestImage = async () => {
+    try {
+      const response = await fetch(`/api/get-latest-image?userId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.imageUrl) {
+          setCurrentImageUrl(data.imageUrl)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching latest image:', error)
+    }
+  }
+
   const handleImageGenerated = (imageUrl: string) => {
     setCurrentImageUrl(imageUrl)
   }

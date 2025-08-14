@@ -6,6 +6,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
 
+    console.log('GET /api/get-latest-image - userId:', userId)
+
     if (!userId) {
       return NextResponse.json(
         { error: 'userId is required' },
@@ -14,7 +16,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the latest image for this user
-    const userImage = getImageMetadata(userId)
+    const userImage = await getImageMetadata(userId)
+    
+    console.log('Retrieved image metadata for user:', userId, 'Data:', userImage)
     
     if (!userImage) {
       return NextResponse.json(

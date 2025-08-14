@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
     })
 
     // Store metadata for later retrieval
-    storeImageMetadata(userId, blob.url)
+    console.log('Storing image metadata for user:', userId, 'URL:', blob.url)
+    await storeImageMetadata(userId, blob.url)
 
     return NextResponse.json({
       imageUrl: blob.url,
