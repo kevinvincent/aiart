@@ -1,47 +1,19 @@
-import { writeFile, readFile, access } from 'fs/promises'
-import { join } from 'path'
+// Simple in-memory store for image metadata
+// In production, you'd use a database like Vercel KV, PostgreSQL, or similar
+// For this demo, we'll use a global variable that persists during the serverless function lifetime
 
-const STORAGE_FILE = join(process.cwd(), 'data', 'image-store.json')
-
-// Ensure data directory exists
-async function ensureDataDir() {
-  try {
-    await access(join(process.cwd(), 'data'))
-  } catch {
-    // Directory doesn't exist, create it
-    const { mkdir } = await import('fs/promises')
-    await mkdir(join(process.cwd(), 'data'), { recursive: true })
-  }
-}
-
-// Read the current storage
-async function readStorage() {
-  try {
-    await ensureDataDir()
-    const data = await readFile(STORAGE_FILE, 'utf-8')
-    return JSON.parse(data)
-  } catch {
-    // File doesn't exist or is invalid, return empty store
-    return {}
-  }
-}
-
-// Write to storage
-async function writeStorage(data: any) {
-  await ensureDataDir()
-  await writeFile(STORAGE_FILE, JSON.stringify(data, null, 2))
-}
+let imageStore: Record<string, { imageUrl: string; createdAt: string }> = {}
 
 export async function storeImageMetadata(userId: string, imageUrl: string) {
-  const storage = await readStorage()
-  storage[userId] = {
+  imageStore[userId] = {
     imageUrl,
     createdAt: new Date().toISOString(),
   }
-  await writeStorage(storage)
+  console.log('Stored image metadata:', { userId, imageUrl, store: imageStore })
 }
 
 export async function getImageMetadata(userId: string) {
-  const storage = await readStorage()
-  return storage[userId] || null
+  const data = imageStore[userId] || null
+  console.log('Retrieved image metadata:', { userId, data, store: imageStore })
+  return data
 }
