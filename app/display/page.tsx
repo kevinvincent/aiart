@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import ImageViewer from '../components/ImageViewer'
 import { useSearchParams } from 'next/navigation'
 
-export default function DisplayPage() {
+function DisplayPageContent() {
   const searchParams = useSearchParams()
   const userId = searchParams.get('userId') || ''
   const [currentImageUrl, setCurrentImageUrl] = useState<string>('')
@@ -88,5 +88,19 @@ export default function DisplayPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function DisplayPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Loading...</h1>
+        </div>
+      </div>
+    }>
+      <DisplayPageContent />
+    </Suspense>
   )
 }
