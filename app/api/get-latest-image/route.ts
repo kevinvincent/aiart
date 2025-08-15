@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Construct the image URL using the userId.png filename pattern
-    const imageUrl = `https://aiart-aiart.vercel.app/${userId}.png`
+    // Construct the image URL using the blob storage URL and images/ path
+    const imageUrl = `https://7cdwn1fzya4iumzs.public.blob.vercel-storage.com/images/${userId}.png`
     
     console.log('Constructed image URL for user:', userId, 'URL:', imageUrl)
     

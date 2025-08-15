@@ -56,15 +56,16 @@ export async function POST(request: NextRequest) {
 
     // Upload to Vercel Blob with predictable path
     const filename = `images/${userId}.png`
-    const blob = await put(filename, imageBuffer, {
+    const { url } = await put(filename, imageBuffer, {
       access: 'public',
+      allowOverwrite: true,
     })
 
     // Store metadata for later retrieval
-    console.log('Image uploaded for user:', userId, 'URL:', blob.url)
+    console.log('Image uploaded for user:', userId, 'URL:', url)
 
     return NextResponse.json({
-      imageUrl: blob.url,
+      imageUrl: url,
       prompt,
       userId,
     })
