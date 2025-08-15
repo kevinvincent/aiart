@@ -12,12 +12,20 @@ const openai = process.env.OPENAI_API_KEY
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, userId } = await request.json()
+    const { prompt, userId, key } = await request.json()
 
-    if (!prompt || !userId) {
+    if (!prompt || !userId || !key) {
       return NextResponse.json(
-        { error: 'Prompt and userId are required' },
+        { error: 'Prompt, userId, and key are required' },
         { status: 400 }
+      )
+    }
+
+    // Validate the key
+    if (key !== 'TEST_KEY') {
+      return NextResponse.json(
+        { error: 'Invalid key' },
+        { status: 401 }
       )
     }
 
