@@ -10,13 +10,13 @@ interface ImageViewerProps {
 
 export default function ImageViewer({ imageUrl, userId, isLoading }: ImageViewerProps) {
   const [currentImage, setCurrentImage] = useState<string>('')
-  const [imageTimestamp, setImageTimestamp] = useState<number>(0)
+  const [refreshCounter, setRefreshCounter] = useState<number>(0)
 
   // Update current image when imageUrl prop changes
   useEffect(() => {
     if (imageUrl && imageUrl !== currentImage) {
       setCurrentImage(imageUrl)
-      setImageTimestamp(Date.now())
+      setRefreshCounter(prev => prev + 1)
     }
   }, [imageUrl, currentImage])
 
@@ -35,9 +35,9 @@ export default function ImageViewer({ imageUrl, userId, isLoading }: ImageViewer
         })
         if (response.ok) {
           const data = await response.json()
-          if (data.imageUrl && data.imageUrl !== currentImage) {
+          if (data.imageUrl) {
             setCurrentImage(data.imageUrl)
-            setImageTimestamp(Date.now())
+            setRefreshCounter(prev => prev + 1)
           }
         }
       } catch (error) {
@@ -62,9 +62,10 @@ export default function ImageViewer({ imageUrl, userId, isLoading }: ImageViewer
       
       {currentImage && (
         <img
-          src={`${currentImage}?t=${imageTimestamp}`}
+          src={currentImage}
           alt="Generated"
           className="image"
+          key={refreshCounter}
         />
       )}
       
