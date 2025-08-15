@@ -10,39 +10,34 @@ interface ImageViewerProps {
 
 export default function ImageViewer({ imageUrl, userId, isLoading }: ImageViewerProps) {
   const [currentImage, setCurrentImage] = useState<string>('')
-  const [previousImage, setPreviousImage] = useState<string>('')
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false)
+  const [imageTimestamp, setImageTimestamp] = useState<number>(0)
 
-  // Handle image transitions with fade effect
+  // Update current image when imageUrl prop changes
   useEffect(() => {
     if (imageUrl && imageUrl !== currentImage) {
-      setPreviousImage(currentImage)
       setCurrentImage(imageUrl)
-      setIsTransitioning(true)
-      
-      // Trigger fade transition
-      setTimeout(() => {
-        setIsTransitioning(false)
-      }, 500)
+      setImageTimestamp(Date.now())
     }
   }, [imageUrl, currentImage])
 
-  // Poll for new images every 5 seconds
+  // Poll for new images every minute
   useEffect(() => {
     if (!userId) return
 
     const pollForUpdates = async () => {
       try {
-        const response = await fetch(`/api/get-latest-image?userId=${userId}`)
+        const response = await fetch(`/api/get-latest-image?userId=${userId}`, {
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        })
         if (response.ok) {
           const data = await response.json()
           if (data.imageUrl && data.imageUrl !== currentImage) {
-            setPreviousImage(currentImage)
             setCurrentImage(data.imageUrl)
-            setIsTransitioning(true)
-            setTimeout(() => {
-              setIsTransitioning(false)
-            }, 500)
+            setImageTimestamp(Date.now())
           }
         }
       } catch (error) {
@@ -50,7 +45,7 @@ export default function ImageViewer({ imageUrl, userId, isLoading }: ImageViewer
       }
     }
 
-    const interval = setInterval(pollForUpdates, 5000)
+    const interval = setInterval(pollForUpdates, 60000) // Poll every minute
     return () => clearInterval(interval)
   }, [userId, currentImage])
 
@@ -65,21 +60,11 @@ export default function ImageViewer({ imageUrl, userId, isLoading }: ImageViewer
         </div>
       )}
       
-      {previousImage && (
-        <img
-          src={previousImage}
-          alt="Previous"
-          className={`image ${isTransitioning ? 'fade-out' : 'fade-in'}`}
-          style={{ zIndex: 1 }}
-        />
-      )}
-      
       {currentImage && (
         <img
-          src={currentImage}
-          alt="Current"
-          className={`image ${isTransitioning ? 'fade-in' : 'fade-in'}`}
-          style={{ zIndex: 2 }}
+          src={`${currentImage}?t=${imageTimestamp}`}
+          alt="Generated"
+          className="image"
         />
       )}
       

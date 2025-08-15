@@ -63,7 +63,7 @@ export default function ImageGenerator({ userId }: ImageGeneratorProps) {
           rows={3}
           disabled={isSubmitting}
           required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-gray-900 placeholder-gray-500"
         />
         <input
           type="password"
@@ -72,7 +72,7 @@ export default function ImageGenerator({ userId }: ImageGeneratorProps) {
           placeholder="Enter your key..."
           disabled={isSubmitting}
           required
-          className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500"
         />
         <button
           type="submit"
