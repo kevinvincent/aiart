@@ -8,21 +8,24 @@ const openai = process.env.OPENAI_API_KEY
     })
   : null
 
+// Known valid user IDs
+const knownUserIds = ['kevinv', 'aurorag']
+
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, userId, key } = await request.json()
+    const { prompt, userId } = await request.json()
 
-    if (!prompt || !userId || !key) {
+    if (!prompt || !userId) {
       return NextResponse.json(
-        { error: 'Prompt, userId, and key are required' },
+        { error: 'Prompt and userId are required' },
         { status: 400 }
       )
     }
 
-    // Validate the key
-    if (key !== 'TEST_KEY') {
+    // Validate the user ID
+    if (!knownUserIds.includes(userId)) {
       return NextResponse.json(
-        { error: 'Invalid key' },
+        { error: 'Invalid user ID. Only known users can generate images.' },
         { status: 401 }
       )
     }

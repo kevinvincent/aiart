@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Known valid user IDs
+const knownUserIds = ['kevinv', 'aurorag']
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -11,6 +14,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: 'userId is required' },
         { status: 400 }
+      )
+    }
+
+    // Validate the user ID
+    if (!knownUserIds.includes(userId)) {
+      return NextResponse.json(
+        { error: 'Invalid user ID. Only known users can access images.' },
+        { status: 401 }
       )
     }
 

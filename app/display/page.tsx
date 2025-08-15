@@ -6,18 +6,19 @@ import { useSearchParams } from 'next/navigation'
 
 function DisplayPageContent() {
   const searchParams = useSearchParams()
-  const userId = searchParams.get('userId') || ''
+  const urlUserId = searchParams.get('userId') || ''
+  const [userId, setUserId] = useState<string>('')
   const [currentImageUrl, setCurrentImageUrl] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  // If no userId provided, redirect to home
+  // Set userId from URL if provided
   useEffect(() => {
-    if (!userId) {
-      window.location.href = '/'
+    if (urlUserId) {
+      setUserId(urlUserId)
     }
-  }, [userId])
+  }, [urlUserId])
 
-  // Fetch the latest image on component mount
+  // Fetch the latest image when userId is available
   useEffect(() => {
     if (userId) {
       fetchLatestImage()
@@ -38,26 +39,46 @@ function DisplayPageContent() {
     }
   }
 
-  const handleImageGenerated = (imageUrl: string) => {
-    setCurrentImageUrl(imageUrl)
-  }
-
-  const handleGenerationStart = () => {
-    setIsLoading(true)
-  }
-
-  const handleGenerationComplete = () => {
-    setIsLoading(false)
+  const handleUserIdSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (userId.trim()) {
+      // Update URL without page reload
+      window.history.pushState({}, '', `/display?userId=${userId.trim()}`)
+    }
   }
 
   if (!userId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">No User ID Provided</h1>
-          <a href="/" className="text-indigo-600 hover:text-indigo-800">
-            Go back to home
-          </a>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">View Your Images</h1>
+          <form onSubmit={handleUserIdSubmit} className="max-w-md mx-auto">
+            <div className="mb-4">
+              <label htmlFor="displayUserId" className="block text-sm font-medium text-gray-700 mb-2">
+                Enter your User ID to view images
+              </label>
+              <input
+                type="password"
+                id="displayUserId"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                placeholder="Enter your user ID"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              View Images
+            </button>
+          </form>
+          <div className="mt-4">
+            <a href="/" className="text-indigo-600 hover:text-indigo-800">
+              ← Back to Generator
+            </a>
+          </div>
         </div>
       </div>
     )
@@ -79,13 +100,6 @@ function DisplayPageContent() {
         >
           ← Back to Generator
         </a>
-      </div>
-      
-      {/* User ID display */}
-      <div className="absolute top-4 right-4 z-30">
-        <div className="bg-white bg-opacity-90 px-3 py-1 rounded-lg text-sm text-gray-600 backdrop-blur-sm">
-          User: {userId}
-        </div>
       </div>
     </main>
   )
