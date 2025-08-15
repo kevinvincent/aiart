@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { put } from '@vercel/blob'
-import { v4 as uuidv4 } from 'uuid'
-import { storeImageMetadata } from '../../lib/imageStore'
 
 const openai = process.env.OPENAI_API_KEY 
   ? new OpenAI({
@@ -56,16 +54,14 @@ export async function POST(request: NextRequest) {
     const imageResponse = await fetch(imageUrl)
     const imageBuffer = await imageResponse.arrayBuffer()
 
-    // Upload to Vercel Blob
-    const filename = `${userId}_${uuidv4()}.png`
+    // Upload to Vercel Blob with predictable path
+    const filename = `images/${userId}.png`
     const blob = await put(filename, imageBuffer, {
       access: 'public',
-      addRandomSuffix: false,
     })
 
     // Store metadata for later retrieval
-    console.log('Storing image metadata for user:', userId, 'URL:', blob.url)
-    await storeImageMetadata(userId, blob.url)
+    console.log('Image uploaded for user:', userId, 'URL:', blob.url)
 
     return NextResponse.json({
       imageUrl: blob.url,

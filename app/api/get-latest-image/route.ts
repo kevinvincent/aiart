@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getImageMetadata } from '../../lib/imageStore'
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,21 +14,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get the latest image for this user
-    const userImage = await getImageMetadata(userId)
+    // Construct the image URL using the userId.png filename pattern
+    const imageUrl = `https://aiart-aiart.vercel.app/${userId}.png`
     
-    console.log('Retrieved image metadata for user:', userId, 'Data:', userImage)
+    console.log('Constructed image URL for user:', userId, 'URL:', imageUrl)
     
-    if (!userImage) {
-      return NextResponse.json(
-        { error: 'No image found for this user' },
-        { status: 404 }
-      )
-    }
-
     return NextResponse.json({
-      imageUrl: userImage.imageUrl,
-      createdAt: userImage.createdAt,
+      imageUrl: imageUrl,
+      createdAt: new Date().toISOString(), // Since we don't have the actual creation time
     })
 
   } catch (error) {
